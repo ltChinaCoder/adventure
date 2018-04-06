@@ -2,7 +2,6 @@ package com.lt.chapter2.service;
 
 import com.lt.chapter2.model.Consumer;
 import junit.framework.TestCase;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

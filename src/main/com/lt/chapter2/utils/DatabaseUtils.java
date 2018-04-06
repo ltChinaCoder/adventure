@@ -12,6 +12,7 @@ import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
+
 @Slf4j
 public class DatabaseUtils {
     private static final String username;
@@ -21,6 +22,7 @@ public class DatabaseUtils {
     private static final QueryRunner queryRunner = new QueryRunner();
     private static final ThreadLocal<Connection> CONNECTION_THREAD_LOCAL;
     private static final BasicDataSource BASIC_DATA_SOURCE;
+
     static {
 
         Properties properties = ProUtils.loadProps("jdbc.properties");
@@ -29,14 +31,13 @@ public class DatabaseUtils {
         jdbcUrl = properties.getProperty("jdbc.url");
         jdbcDriver = properties.getProperty("jdbc.driver");
         CONNECTION_THREAD_LOCAL = new ThreadLocal<Connection>();
-        BASIC_DATA_SOURCE=new BasicDataSource();
+        BASIC_DATA_SOURCE = new BasicDataSource();
         BASIC_DATA_SOURCE.setUsername(username);
         BASIC_DATA_SOURCE.setPassword(password);
         BASIC_DATA_SOURCE.setUrl(jdbcUrl);
         BASIC_DATA_SOURCE.setDriverClassName(jdbcDriver);
-        BASIC_DATA_SOURCE.setRemoveAbandonedTimeout(1);
-        BASIC_DATA_SOURCE.setRemoveAbandoned(true);
     }
+
     public static Connection getConnenction() {
         Connection connection = null;
         connection = CONNECTION_THREAD_LOCAL.get();
@@ -52,6 +53,7 @@ public class DatabaseUtils {
         }
         return connection;
     }
+
     public static void closeConnection() {
         Connection connection = CONNECTION_THREAD_LOCAL.get();
         if (connection == null) return;
@@ -65,6 +67,7 @@ public class DatabaseUtils {
             CONNECTION_THREAD_LOCAL.remove();
         }
     }
+
     public static <T> T getBean(Class<T> tClass, String sql, Object... params) {
         T t = null;
         try {
@@ -76,6 +79,7 @@ public class DatabaseUtils {
         }
         return t;
     }
+
     public static <T> T getBeanById(Class<T> tClass, long id) {
         T t = null;
         try {
@@ -91,6 +95,7 @@ public class DatabaseUtils {
         }
         return t;
     }
+
     public static <T> List<T> getList(Class<T> tClass, String sql, Object... params) {
         List<T> ts = null;
         try {
@@ -102,9 +107,11 @@ public class DatabaseUtils {
         }
         return ts;
     }
+
     public static <T> List<T> getList(Class<T> tClass, String sql) {
         return getList(tClass, sql, null);
     }
+
     public static Map<String, String> getColumnToPropertyOverrides() {
         Map<String, String> stringStringMap = new HashMap<String, String>();
         stringStringMap.put("consumer_id", "consumerId");
@@ -115,6 +122,7 @@ public class DatabaseUtils {
         stringStringMap.put("consumer_remark", "consumerRemark");
         return stringStringMap;
     }
+
     public static List<Map<String, Object>> mulQuery(String sql, Object... params) {
         List<Map<String, Object>> ts = null;
         try {
@@ -126,6 +134,7 @@ public class DatabaseUtils {
         }
         return ts;
     }
+
     public static int infectRow(String sql, Object... params) {
         int res = -1;
         try {
@@ -137,10 +146,12 @@ public class DatabaseUtils {
         }
         return res;
     }
+
     public static <T> boolean deleteEntityById(Class<T> tClass, long id) {
         String sql = "delete from " + getTableName(tClass) + " where " + getIdFiled(tClass) + " = ?";
         return infectRow(sql, new Object[]{id}) == 1;
     }
+
     public static <T> boolean updateEntity(Class<T> tClass, long id, Map<String, Object> map) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("update ").append(getTableName(tClass)).append(" set ");
@@ -158,6 +169,7 @@ public class DatabaseUtils {
         objects1[objects.length] = id;
         return infectRow(stringBuilder.toString(), objects1) == 1;
     }
+
     public static <T> boolean insertEntity(Class<T> tClass, Map<String, Object> map) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("insert into ").append(getTableName(tClass)).append("(");
@@ -180,9 +192,11 @@ public class DatabaseUtils {
         stringBuilder.append(")");
         return infectRow(stringBuilder.toString(), map.values().toArray()) == 1;
     }
+
     private static <T> String getTableName(Class<T> tClass) {
         return tClass.getSimpleName().toLowerCase();
     }
+
     public static String getFileNameByColumnName(String columnName) {
         String[] split = columnName.split("_");
         StringBuilder sb = new StringBuilder();
@@ -193,6 +207,7 @@ public class DatabaseUtils {
         }
         return sb.toString();
     }
+
     public static String getColumnNameByFileName(String filename) {
         char[] chars = filename.toCharArray();
         StringBuilder sb = new StringBuilder();
@@ -204,6 +219,7 @@ public class DatabaseUtils {
         }
         return sb.toString();
     }
+
     public static <T> String getIdFiled(Class<T> tClass) {
         Field[] fields = tClass.getDeclaredFields();
         for (Field field : fields) {
